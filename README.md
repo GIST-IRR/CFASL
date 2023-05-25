@@ -125,7 +125,6 @@ Set $DATA_DIR$ as
 
     #!/bin/sh
     trap "exit" INT
-    
     CUDA_VISIBLE_DEVICES=$DEVICE_IDX$ python $FILE DIR$/main.py \
     --device_idx $DEVICE_IDX$ \
     --dataset CHOOSE ONE OF THEM: {dsprites, shapes3d, car, smallnorb}\
@@ -151,7 +150,6 @@ Set $DATA_DIR$ as
     --lamb 1.0 \
     --quali_sampling $EQUAL TO latent_dim$ \
     --do_mfvm --do_train --do_eval --write 
-    
     # Common Hyper-Parameter Settings
     --sub_sec {16 (3D Shapes), 10 (Others) } \
     --epsilon {0.1 0.01} \
