@@ -112,7 +112,7 @@ To create the environment:
  
 ## Training
 
-Set $DATA_DIR$ as
+Set {DATA_DIR} as
 
 * dSprites: {data dir}/{filename}
 
@@ -122,7 +122,7 @@ Set $DATA_DIR$ as
 
 * 3D Shapes: {data dir} (we transform the h5 file to images)
 
-
+# Model Training and Evaluation
 
     #!/bin/sh
     trap "exit" INT
