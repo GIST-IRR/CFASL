@@ -125,13 +125,13 @@ Set $DATA_DIR$ as
 
     #!/bin/sh
     trap "exit" INT
-    CUDA_VISIBLE_DEVICES=$DEVICE_IDX$ python $FILE DIR$/main.py \
-    --device_idx $DEVICE_IDX$ \
+    CUDA_VISIBLE_DEVICES={DEVICE_IDX} python {FILE DIR}/main.py \
+    --device_idx {RDEVICE_IDX} \
     --dataset CHOOSE ONE OF THEM: {dsprites, shapes3d, car, smallnorb}\
-    --data_dir $DATA_DIR$ \
-    --output_dir CHECKPOINT DIR$ \
-    --run_file $TENSORBOSRD RUNFILE DIR$ \
-    --project_name $WADNB PROJECT_NAME$ \
+    --data_dir {DATA_DI}$ \
+    --output_dir {CHECKPOINT DIR} \
+    --run_file {TENSORBOSRD RUNFILE DIR} \
+    --project_name {WADNB PROJECT_NAME} \
     --model_type CHOOSE ONE OF THEM: {betavae, betatcvae, controlvae, commutativevae, cfasl_betavae, cfasl_betatcvae, cfasl_controlvae, cfasl_commutativevae} \
     --latent_dim {6 (3D Shapes), 10 (Others)} \
     --split 0.0 \
@@ -139,8 +139,8 @@ Set $DATA_DIR$ as
     --test_batch_size 64 \
     --num_epoch 0 \
     --max_steps {1,000,000 (CelebA), 500,000 (3D Shapes), 300,000 (Others)} \
-    --save_steps $SAVE_STEPS$ \ # set as large neumber {1e+9}
-    --patience $PATIENCE \ # set as large neumber {1e+9}
+    --save_steps {SAVE_STEPS} \ # set as large neumber {1e+9}
+    --patience {PATIENCE} \ # set as large neumber {1e+9}
     --optimizer adam \
     --seed {1,2,3,4,5,6,7,8,9,10} \
     --lr_rate 1e-4 \
@@ -148,17 +148,17 @@ Set $DATA_DIR$ as
     --alpha 1.0\
     --gamma 1.0 \
     --lamb 1.0 \
-    --quali_sampling $EQUAL TO latent_dim$ \
+    --quali_sampling {EQUAL TO latent_dim} \
     --do_mfvm --do_train --do_eval --write 
-    # Common Hyper-Parameter Settings
+    Common Hyper-Parameter Settings
     --sub_sec {16 (3D Shapes), 10 (Others) } \
     --epsilon {0.1 0.01} \
     --th {0.2 0.5} \
-    # IF BETA-VAE or -TCVAE
+    IF BETA-VAE or -TCVAE
     --beta {1.0 2.0 4.0 6.0} \
-    # IF Control-VAE
+    IF Control-VAE
     --c {10.0 12.0 14.0 16.0}
-    # IF Commutative Lie Group
+    IF Commutative Lie Group
     --rec {0.1 0.2 0.5 0.7}
     
 ## Results
