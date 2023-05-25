@@ -123,6 +123,7 @@ Set $DATA_DIR$ as
 * 3D Shapes: {data dir} (we transform the h5 file to images)
 
 
+
     #!/bin/sh
     trap "exit" INT
     CUDA_VISIBLE_DEVICES={DEVICE_IDX} python {FILE DIR}/main.py \
@@ -161,6 +162,7 @@ Set $DATA_DIR$ as
     IF Commutative Lie Group
     --rec {0.1 0.2 0.5 0.7}
     
+
 ## Results
 
 | 3DCars | FVM | z-diff | MIG | SAP | DCI | m-FMV<sub>2 |
