@@ -1,11 +1,8 @@
 import torch.utils.data as data
 
+
 class DisenDataLoader(data.Dataset):
-    def __init__(self,
-                 path,
-                 shuffle_dataset=True,
-                 random_seed=42,
-                 split_ratio = 0.2):
+    def __init__(self, path, shuffle_dataset=True, random_seed=42, split_ratio=0.2):
         self.path = path
         self.shuffle_dataset = shuffle_dataset
         self.random_seed = random_seed

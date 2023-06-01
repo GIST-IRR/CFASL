@@ -9,14 +9,16 @@ from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm
 
 from torch.optim import SGD, Adam
+
 OPTIMIZER = {
-    'sgd': SGD,
-    'adam': Adam,
+    "sgd": SGD,
+    "adam": Adam,
 }
 
-device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 def eval(train_dataset, model, loss_fn, args):
     set_seed(args)
@@ -33,21 +35,33 @@ def eval(train_dataset, model, loss_fn, args):
         # tb_writer = SummaryWriter(run_file)
 
     args.train_batch_size = args.per_gpu_train_batch_size * max(1, args.n_gpu)
-    train_sampler = RandomSampler(train_dataset) if args.local_rank == -1 else DistributedSampler(train_dataset)
-    train_dataloader = DataLoader(train_dataset, sampler=train_sampler, batch_size=args.test_batch_size,
-                                  drop_last=False, pin_memory=True)
+    train_sampler = (
+        RandomSampler(train_dataset)
+        if args.local_rank == -1
+        else DistributedSampler(train_dataset)
+    )
+    train_dataloader = DataLoader(
+        train_dataset,
+        sampler=train_sampler,
+        batch_size=args.test_batch_size,
+        drop_last=False,
+        pin_memory=True,
+    )
     global_step = 0
     learning_rate = args.lr_rate
     t_total = len(train_dataloader)
 
-    #multi-gpu training (should be after apex fp16 initialization)
+    # multi-gpu training (should be after apex fp16 initialization)
     if args.n_gpu > 1:
         model = torch.nn.DataParallel(model)
 
     # Distributed training (should be after apex fp16 initialization)
     if args.local_rank != -1:
         model = torch.nn.parallel.DistributedDataParallel(
-            model, device_ids=[args.local_rank], output_device=args.local_rank, find_unused_parameters=True,
+            model,
+            device_ids=[args.local_rank],
+            output_device=args.local_rank,
+            find_unused_parameters=True,
         )
 
     # Train
@@ -57,7 +71,8 @@ def eval(train_dataset, model, loss_fn, args):
     logger.info(" Batch size per GPU = %d", args.per_gpu_train_batch_size)
     logger.info(
         " Total train batch size = %d",
-        args.train_batch_size * (torch.distributed.get_world_size() if args.local_rank != -1 else 1),
+        args.train_batch_size
+        * (torch.distributed.get_world_size() if args.local_rank != -1 else 1),
     )
     logger.info("Total optimization steps = %d", t_total)
 
@@ -98,7 +113,7 @@ def eval(train_dataset, model, loss_fn, args):
     equivariant = None
     mse = None
     positive = None
-    #negative= None
+    # negative= None
 
     # for Control VAE
     beta = None
@@ -110,7 +125,7 @@ def eval(train_dataset, model, loss_fn, args):
     iteration_per_epoch = len(train_dataloader)
 
     results = {}
-    #model.zero_grad()
+    # model.zero_grad()
     iteration = tqdm(train_dataloader, desc="Iteration")
 
     for i, (data, class_label) in enumerate(iteration):
@@ -119,36 +134,42 @@ def eval(train_dataset, model, loss_fn, args):
             data = data.to(device)
             outputs = model(data, loss_fn)
 
-            reconst_err, kld_err = outputs[0]['obj']['reconst'], outputs[0]['obj']['kld']
+            reconst_err, kld_err = (
+                outputs[0]["obj"]["reconst"],
+                outputs[0]["obj"]["kld"],
+            )
 
-            if args.model_type == 'betatcvae' or args.model_type == 'groupbetatcvae':
-                mi = outputs[0]['obj']['mi']
-                tc = outputs[0]['obj']['tc']
-            elif args.model_type == 'commutativevae' or args.model_type == 'groupcommutativevae':
-                group = outputs[0]['obj']['group']
+            if args.model_type == "betatcvae" or args.model_type == "groupbetatcvae":
+                mi = outputs[0]["obj"]["mi"]
+                tc = outputs[0]["obj"]["tc"]
+            elif (
+                args.model_type == "commutativevae"
+                or args.model_type == "groupcommutativevae"
+            ):
+                group = outputs[0]["obj"]["group"]
 
-            if args.model_type == 'controlvae':
+            if args.model_type == "controlvae":
                 total_loss = reconst_err + kld_err
-            elif args.model_type == 'betavae':
+            elif args.model_type == "betavae":
                 total_loss = reconst_err + args.beta * kld_err
-            elif args.model_type == 'betatcvae':
-                total_loss = reconst_err + \
-                             args.alpha * mi + \
-                             args.beta * tc + \
-                             args.gamma * kld_err
-            elif args.model_type == 'commutativevae':
+            elif args.model_type == "betatcvae":
+                total_loss = (
+                    reconst_err
+                    + args.alpha * mi
+                    + args.beta * tc
+                    + args.gamma * kld_err
+                )
+            elif args.model_type == "commutativevae":
                 total_loss = reconst_err + kld_err + group
-            elif args.model_type == 'groupvae':
+            elif args.model_type == "groupvae":
                 total_loss = reconst_err + args.beta * kld_err
-            elif args.model_type == 'groupbetatcvae':
-                total_loss = reconst_err + \
-                             mi + args.beta * tc + kld_err
+            elif args.model_type == "groupbetatcvae":
+                total_loss = reconst_err + mi + args.beta * tc + kld_err
 
-            elif args.model_type == 'groupcommutativevae':
-                total_loss = reconst_err + kld_err + \
-                             group
+            elif args.model_type == "groupcommutativevae":
+                total_loss = reconst_err + kld_err + group
 
-            elif args.model_type == 'groupcontrolvae':
+            elif args.model_type == "groupcontrolvae":
                 total_loss = reconst_err + kld_err
 
             if args.n_gpu > 1:
@@ -156,10 +177,16 @@ def eval(train_dataset, model, loss_fn, args):
                 reconst_err = reconst_err.mean()
                 kld_err = kld_err.mean()
 
-                if args.model_type == 'betatcvae' or args.model_type == 'groupbetatcvae':
+                if (
+                    args.model_type == "betatcvae"
+                    or args.model_type == "groupbetatcvae"
+                ):
                     mi = mi.mean()
                     tc = tc.mean()
-                elif args.model_type == 'commutativevae' or args.model_type == 'groupcommutativevae':
+                elif (
+                    args.model_type == "commutativevae"
+                    or args.model_type == "groupcommutativevae"
+                ):
                     group = group.mean()
 
             elbo = -(reconst_err + kld_err)
@@ -168,21 +195,26 @@ def eval(train_dataset, model, loss_fn, args):
             tr_reconst_err += reconst_err.item()
             tr_kld_err += kld_err.item()
 
-            if args.model_type == 'betatcvae' or args.model_type == 'groupbetatcvae':
+            if args.model_type == "betatcvae" or args.model_type == "groupbetatcvae":
                 tr_mi += mi.item()
                 tr_tc += tc.item()
-            elif args.model_type == 'commutativevae' or args.model_type == 'groupcommutativevae':
+            elif (
+                args.model_type == "commutativevae"
+                or args.model_type == "groupcommutativevae"
+            ):
                 tr_group = group.item()
             global_step += 1
 
-    results['elbo'] = tr_elbo / t_total
-    results['reconst'] = tr_reconst_err / t_total
-    results['kld'] = tr_kld_err / t_total
+    results["elbo"] = tr_elbo / t_total
+    results["reconst"] = tr_reconst_err / t_total
+    results["kld"] = tr_kld_err / t_total
 
-    if args.model_type == 'betatcvae' or args.model_type == 'groupbetatcvae':
-        results['mi'] = tr_mi / t_total
-        results['tc'] = tr_tc / t_total
-    elif args.model_type == 'commutativevae' or args.model_type == 'groupcommutativevae':
-        results['group'] = tr_group / t_total
+    if args.model_type == "betatcvae" or args.model_type == "groupbetatcvae":
+        results["mi"] = tr_mi / t_total
+        results["tc"] = tr_tc / t_total
+    elif (
+        args.model_type == "commutativevae" or args.model_type == "groupcommutativevae"
+    ):
+        results["group"] = tr_group / t_total
 
     return results

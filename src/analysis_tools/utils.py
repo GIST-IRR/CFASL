@@ -8,6 +8,7 @@ def fixed_one_factor(fixed_indexs):
         fixed_factors.append(full_factors)
     return fixed_factors
 
+
 def find_index_from_factors(factors, dataset):
     factor_dict = {}
     sampled_idx = []

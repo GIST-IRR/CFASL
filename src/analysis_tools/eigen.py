@@ -7,13 +7,21 @@ from torch.utils.data import DataLoader, RandomSampler
 from torch.utils.data.distributed import DistributedSampler
 import matplotlib.pyplot as plt
 
-device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def analysis_of_basis(dataset, model, loss_fn, save_file, args, batch_size=64):
     set_seed(args)
-    train_sampler = RandomSampler(dataset) if args.local_rank == -1 else DistributedSampler(dataset)
-    train_dataloader = DataLoader(dataset, sampler=train_sampler, batch_size=args.train_batch_size,
-                                  drop_last=False, pin_memory=True)
+    train_sampler = (
+        RandomSampler(dataset) if args.local_rank == -1 else DistributedSampler(dataset)
+    )
+    train_dataloader = DataLoader(
+        dataset,
+        sampler=train_sampler,
+        batch_size=args.train_batch_size,
+        drop_last=False,
+        pin_memory=True,
+    )
     global_step = 0
 
     iteration = tqdm(train_dataloader, desc="Iteration")
@@ -41,14 +49,14 @@ def analysis_of_basis(dataset, model, loss_fn, save_file, args, batch_size=64):
 
     # save eigenvalues graph
     path = os.path.join(args.output_dir, args.model_type, save_file)
-    save_dir = os.path.join(path, 'eigenvalues' + '.png')
+    save_dir = os.path.join(path, "eigenvalues" + ".png")
     # bar chart
     fig, ax = plt.subplots(figsize=(10, 10))
 
     x = np.arange(cov_mat.shape[1])
     x_label = []
     for i in x:
-        x_label.append('eig_v' + str(i))
+        x_label.append("eig_v" + str(i))
     ax.bar(x, eigenvalues)
     ax.set_xticks(x, x_label)
     plt.savefig(save_dir)
@@ -56,7 +64,7 @@ def analysis_of_basis(dataset, model, loss_fn, save_file, args, batch_size=64):
 
     # save eigenvectors
     path = os.path.join(args.output_dir, args.model_type, save_file)
-    save_dir = os.path.join(path, 'eigenvectors' + '.png')
+    save_dir = os.path.join(path, "eigenvectors" + ".png")
     # heatmap
     plt.pcolor(np.abs(eigenvectors))
     plt.colorbar()

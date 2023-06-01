@@ -5,10 +5,16 @@ from src.seed import set_seed
 from sklearn import linear_model
 
 logger = logging.getLogger(__name__)
-def compute_beta_vae(dataset, model, batch_size, num_train, num_eval, loss_fn, args):
-    logger.info("*********************Beta-VAE Disentanglement Evaluation*********************")
 
-    train_points, train_labels = generate_training_batch(dataset, model, batch_size, num_train, loss_fn, args)
+
+def compute_beta_vae(dataset, model, batch_size, num_train, num_eval, loss_fn, args):
+    logger.info(
+        "*********************Beta-VAE Disentanglement Evaluation*********************"
+    )
+
+    train_points, train_labels = generate_training_batch(
+        dataset, model, batch_size, num_train, loss_fn, args
+    )
     set_seed(args)
     regression_model = linear_model.LogisticRegression(max_iter=200)
     regression_model.fit(train_points, train_labels)
@@ -16,23 +22,28 @@ def compute_beta_vae(dataset, model, batch_size, num_train, num_eval, loss_fn, a
     train_accuracy = regression_model.score(train_points, train_labels)
     logging.info("Training set accuracy: %.2g", train_accuracy)
 
-    eval_points, eval_labels = generate_training_batch(dataset, model, batch_size, num_eval, loss_fn, args)
+    eval_points, eval_labels = generate_training_batch(
+        dataset, model, batch_size, num_eval, loss_fn, args
+    )
     eval_accuracy = regression_model.score(eval_points, eval_labels)
     return eval_accuracy
 
+
 def generate_training_batch(dataset, model, batch_size, num_points, loss_fn, args):
-    points = None # Dimensionality depends on the representation function.
+    points = None  # Dimensionality depends on the representation function.
     labels = np.zeros(num_points, dtype=np.int64)
     set_seed(args)
     for i in range(num_points):
-        labels[i], feature_vector = generate_training_sample(dataset, model, batch_size, loss_fn, args)
+        labels[i], feature_vector = generate_training_sample(
+            dataset, model, batch_size, loss_fn, args
+        )
         if points is None:
             points = np.zeros((num_points, feature_vector.shape[0]))
         points[i, :] = feature_vector
     return points, labels
 
-def generate_training_sample(dataset, model, batch_size, loss_fn, args):
 
+def generate_training_sample(dataset, model, batch_size, loss_fn, args):
     # select random coordinate to keep fixed.
     fixed_index = np.random.randint(dataset.factor_num)
     # Sample two mini batches of latent variables.
@@ -59,8 +70,9 @@ def generate_training_sample(dataset, model, batch_size, loss_fn, args):
     latent_vector_2 = model(imgs_2, loss_fn)[1][0]
 
     feature_vector = torch.mean(torch.abs(latent_vector_1 - latent_vector_2), dim=-2)
-    feature_vector = feature_vector.detach().cpu().numpy() # (latent_dim)
+    feature_vector = feature_vector.detach().cpu().numpy()  # (latent_dim)
     return fixed_index, feature_vector
+
 
 def find_index_from_factors(factors, dataset):
     factor_dict = {}

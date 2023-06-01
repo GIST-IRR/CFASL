@@ -5,7 +5,8 @@ import numpy as np
 from src.analysis_tools.utils import find_index_from_factors
 from src.disent_metrics.betavae import find_index_from_factors
 
-device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def plotting_3d(dataset, model, loss_fn, save_file, args, batch_size=64):
     z_list = []
@@ -30,7 +31,7 @@ def plotting_3d(dataset, model, loss_fn, save_file, args, batch_size=64):
         composition_index = np.random.choice(len(dataset.data), batch_size)
         imgs, factors = [], []
         # Find the Factor Label corresponding to the Dataset Index and save it to the Factors List
-        for idx in (composition_index):
+        for idx in composition_index:
             factors.append(dataset.latents_classes[idx])
         factors = np.stack(factors, axis=0)  # (batch, # of factors)
 
@@ -52,7 +53,7 @@ def plotting_3d(dataset, model, loss_fn, save_file, args, batch_size=64):
         # run model
         outputs = model.encoder(imgs)
         z, mu, logvar = outputs[0], outputs[1], outputs[2]
-        kld = -0.5 * torch.mean(1 + logvar - mu ** 2 - logvar.exp(), dim=0)
+        kld = -0.5 * torch.mean(1 + logvar - mu**2 - logvar.exp(), dim=0)
         # pick highest 3 dim values.
         _, topk_idx = torch.topk(kld, 3, dim=-1)
         z_list.append(z[:, topk_idx].detach().cpu().numpy())
@@ -61,9 +62,9 @@ def plotting_3d(dataset, model, loss_fn, save_file, args, batch_size=64):
     class_list = np.concatenate(class_list)  # (10 * batch)
 
     path = os.path.join(args.output_dir, args.model_type, save_file)
-    with open(os.path.join(path, 'plot_3d.pickle'), 'wb') as f:
+    with open(os.path.join(path, "plot_3d.pickle"), "wb") as f:
         pickle.dump(z_list, f)
-    with open(os.path.join(path, 'plot_labels.pickle'), 'wb') as f:
+    with open(os.path.join(path, "plot_labels.pickle"), "wb") as f:
         pickle.dump(class_list, f)
 
     return

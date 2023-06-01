@@ -1,5 +1,6 @@
 from configs.utils import VAEConfig
 
+
 class GroupActionVAEConfig(VAEConfig):
     def __init__(self, args):
         super(GroupActionVAEConfig, self).__init__(args)
@@ -9,6 +10,7 @@ class GroupActionVAEConfig(VAEConfig):
         self.beta = args.beta
         self.th = args.th
         self.sub_sec = args.sub_sec
+
 
 class GroupActionBetaTCVAEConfig(GroupActionVAEConfig):
     def __init__(self, args, dataset_size=0):
@@ -26,6 +28,7 @@ class GroupActionControlVAEConfig(GroupActionVAEConfig):
         self.k_i = args.k_i
         self.k_p = args.k_p
 
+
 class GroupActionCommutativeVAEConfig(GroupActionVAEConfig):
     def __init__(self, args):
         super(GroupActionCommutativeVAEConfig, self).__init__(args)
@@ -36,4 +39,3 @@ class GroupActionCommutativeVAEConfig(GroupActionVAEConfig):
         self.hy_rec = args.hy_rec
         self.hy_commute = args.hy_commute
         self.forward_eq_prob = args.forward_eq_prob
-
