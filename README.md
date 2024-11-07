@@ -2,7 +2,7 @@
 
 This repository is the official implementation of [CFASL: Composite Factor-Aligned Symmetry Learning for Disentanglement in Variational AutoEncoder (TMLR)](https://openreview.net/forum?id=mDGvrH7lju)
 
-![ex_screenshot](./figs/overview_01.jpg)
+![ScreenShot](./figs/overview_01.jpg)
 
 ## Abstract
 
