@@ -1,14 +1,24 @@
 # CFASL: Composite Factor-Aligned Symmetry Learning for Disentanglement in Variational AutoEncoder
 
-This repository is the official implementation of CFASL: Composite Factor-Aligned Symmetry Learning for Disentanglement in Variational AutoEncoder
-![ex_screenshot](./figs/overview.jpg)
+This repository is the official implementation of [CFASL: Composite Factor-Aligned Symmetry Learning for Disentanglement in Variational AutoEncoder (TMLR)](https://openreview.net/forum?id=mDGvrH7lju)
+![ex_screenshot](./figs/overview_01.jpg)
 
 ## Abstract
 
-Implemented symmetries of input and latent vectors is important for disentanglement learning in VAEs, but most works focus on disentangling each factor without consideration of multi-factor change close to real world transformation between two samples, and even a few studies to handle it in autoencoder literature are constrained to pre-defined factors.
-We propose a novel disentanglement framework for Composite Factor-Aligned Symmetry Learning (CFASL) on VAEs for the extension to general multi-factor change condition without constraint. 
-CFASL disentangles representations by 1) aligning their changes, explicit symmetries, and unknown factors via proposed inductive bias, 2) building a composite symmetry for multi-factor change between two samples, and 3) inducing group equivariant encoder and decoder in the condition. To set up the multi-factor change condition, we propose sample pairing for inputs, and an extended evaluation metric.
-In quantitative and in-depth qualitative analysis, CFASL shows significant improvement of disentanglement in multi-factor change condition compared to state-of-the-art methods and also gradually improves in single factor change condition on common benchmarks.
+Symmetries of input and latent vectors have provided valuable insights for disentanglement
+learning in VAEs. However, only a few works were proposed as an unsupervised method,
+and even these works require known factor information in the training data. We propose a
+novel method, Composite Factor-Aligned Symmetry Learning (CFASL), which is integrated
+into VAEs for learning symmetry-based disentanglement in unsupervised learning without
+any knowledge of the dataset factor information. CFASL incorporates three novel features
+for learning symmetry-based disentanglement: 1) Injecting inductive bias to align latent
+vector dimensions to factor-aligned symmetries within an explicit learnable symmetry codebook 2) Learning a composite symmetry to express unknown factors change between two
+random samples by learning factor-aligned symmetries within the codebook 3) Inducing a
+group equivariant encoder and decoder in training VAEs with the two conditions. In addition,
+we propose an extended evaluation metric for multi-factor changes in comparison
+to disentanglement evaluation in VAEs. In quantitative and in-depth qualitative analysis,
+CFASL demonstrates a significant improvement of disentanglement in single-factor change,
+and multi-factor change conditions compared to state-of-the-art methods.
 
 ## General Settings
 We set the below settings for all experiments in
@@ -161,65 +171,20 @@ Set {DATA_DIR} as
     --c {10.0 12.0 14.0 16.0}
     IF Commutative Lie Group
     --rec {0.1 0.2 0.5 0.7}
-    
 
-## Results
-
-| 3DCars | FVM | z-diff | MIG | SAP | DCI | m-FMV<sub>2 |
-|--------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-| $\beta$-VAE | 91.83(4.39) | 100.00(0.00) | 11.44(1.07) | 0.63(0.24) | 27.65(2.50) | 61.28(9.40) | 
-| $\beta$-TCVAE | 92.32(3.38) | 100.00(0.00) | 17.19(3.06) | 1.13(0.37) | 33.63(3.27) | 59.25(5.63) | 
-| Control-VAE | 93.86(5.22) | 100.00(0.00) | 9.73(2.24) | 1.14(0.54) | 25.66(4.61) | 46.42(10.34) | 
-| CLG-VAE | 91.61(2.84) | 100.00(0.00) | 11.62(1.65) | 1.35(0.26) | 29.55(1.93) | 47.75(5.83) | 
-| **CFASL**($\beta$-TCVAE) | **95.70**(1.90) | **100.00**(0.00) | **18.58**(1.24) | **1.43**(0.18) | **34.81**(3.85) | **62.43**(8.08) | 
-
-| smallNORB | FVM | z-diff | MIG | SAP | DCI | m-FMV<sub>2 | m-FVM<sub>3 |
-|--------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-| $\beta$-VAE | 60.71(2.47) | 59.40(7.72) | 21.60(0.59) | 11.02(0.18) | 25.43(0.48) | 24.41(3.34) | 15.13(2.76) | 
-| $\beta$-TCVAE | 59.30(2.52) | 60.40(5.48) | 21.64(0.51) | 11.11(0.27) | 25.74(0.29) | 25.71(3.51) | 15.66(3.74) | 
-| Control-VAE | 60.63(2.67) | 61.40(4.33) | 21.55(0.53) | 11.18(0.48) | **25.97**(0.43) | 24.11(3.41) | 16.12(2.53) | 
-| CLG-VAE | 62.27(1.71) | 62.60(5.17) | 21.39(0.67) | 10.71(0.33) | 22.95(0.62) | 25.71(3.51) | 15.66(3.74) | 
-| **CFASL**($\beta$-TCVAE) | **62.73**(3.96) | **63.20**(4.13) | **22.23**(0.48) | **11.42**(0.48) | 24.58(0.51) | **27.96**(3.00) | **17.37**(2.33) | 
-
-
-| dSprites | FVM | z-diff | MIG | SAP | DCI | m-FMV<sub>2 | m-FVM<sub>3 | m-FVM<sub>4 |
-|--------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-| $\beta$-VAE | 73.54(6.47) | 83.20(7.07) | 13.19(4.48) | 5.69(1.98) | 21.49(6.30) | 53.80(10.29) | 50.13(11.98) | 48.02(8.98) |
-| $\beta$-TCVAE | 79.19(5.87) | 89.20(4.73) | 23.95(10.13) | 7.20(0.66) | 35.33(9.07) | 61.75(6.71) | 57.82(5.39) | 63.81(9.45) |
-| Control-VAE | 69.64(7.67) | 82.80(7.79) | 5.93(2.78) | 3.89(1.89) | 12.42(4.95) | 38.99(9.31) | 29.00(10.75) | 19.33(5.98) |
-| CLG-VAE | **82.33**(5.59) | 86.80(3.43) | 22.96(6.08) | 7.07(0.86) | 31.23(5.32) | 63.21(8.13) | 48.68(9.59) | 51.00(8.13) |
-| **CFASL**($\beta$-TCVAE) | 82.30(5.64) | **90.20**(5.53) | **33.62**(8.18) | **7.28**(0.63) | **46.52**(6.18) | **68.32**(0.13) | **66.25**(7.36) | **71.35**(12.08) |
-
-| 3DShapes | FVM | z-diff | MIG | SAP | DCI | m-FMV<sub>2 | m-FVM<sub>3 | m-FVM<sub>4 | m-FVM<sub>5 |
-|--------|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
-| $\beta$-VAE | 79.54(6.96) | 89.33(5.89) | 51.96(13.86) | **8.48**(8.48) | 63.65(7.91) | 65.21(7.92) | 66.04(4.36) | 69.00(4.22) | 80.26(3.78) |
-| $\beta$-TCVAE | 78.58(2.97) | 85.33(7.12) | **61.72**(0.85) | 6.07(0.19) | **66.49**(1.14) | 69.25(0.72) | 65.47(9.63) | 70.25(6.77)| 79.21(5.87) |
-| Control-VAE | 70.75(18.33) | 83.67(11.41) | 36.49(23.31) | 5.68(3.46) | 48.00(18.55) | 49.02(19.08) | 61.90(9.73) | 63.31(9.85) | 73.31(6.54) |
-| CLG-VAE | 74.60(11.06) | 83.00(10.64) | 47.09(18.56) | 5.58(2.22) | 58.17(11.36) | 60.25(11.88) | 59.60(5.26) | 61.99(4.59) | 73.61(4.22) |
-| **CFASL**($\beta$-VAE) | **82.56**(3.97) | **90.00**(6.20) | 55.56(4.67) | 7.30(0.30) | 62.26(3.85) | **72.83**(4.12) | **69.28**(4.32) | **72.35**(4.85) | **83.03**(2.73) |
-
-More details are in the paper.
-
-#### 3D plots on dSprites (z-axis: shape, x- and y-axis: x- and y- pos)
-![ex_screenshot](./figs/motivation.jpg)
-
-#### Qualitative Analysis Overview
-![ex_screenshot](./figs/quali-overview.jpg)
-
-##### 1) Composition
-![ex_screenshot](./figs/composition.jpg)
-
-##### 2) Composite Symmetries Decomposition
-![ex_screenshot](./figs/com-int.jpg)
-
-##### 3) Largest KLD Dimension Change
-![ex_screenshot](./figs/largest.jpg)
-
-##### 4) Unseen Prediction Change Sequential Case
-![ex_screenshot](./figs/sequential.jpg)
-
-More details are in the paper.
 
 ## Contributing
 
 All content in this repository is licensed under the MIT license.
+
+### Reference
+
+    @article{
+    anonymous2024cfasl,
+    title={{CFASL}: Composite Factor-Aligned Symmetry Learning for Disentanglement in Variational AutoEncoder},
+    author={Anonymous},
+    journal={Submitted to Transactions on Machine Learning Research},
+    year={2024},
+    url={https://openreview.net/forum?id=mDGvrH7lju},
+    note={Under review}
+    }
