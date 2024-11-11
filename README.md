@@ -181,11 +181,12 @@ All content in this repository is licensed under the MIT license.
 ### Reference
 
     @article{
-    anonymous2024cfasl,
+    jung2024cfasl,
     title={{CFASL}: Composite Factor-Aligned Symmetry Learning for Disentanglement in Variational AutoEncoder},
-    author={Anonymous},
-    journal={Submitted to Transactions on Machine Learning Research},
+    author={Hee-Jun Jung and Jaehyoung Jeong and Kangil Kim},
+    journal={Transactions on Machine Learning Research},
+    issn={2835-8856},
     year={2024},
     url={https://openreview.net/forum?id=mDGvrH7lju},
-    note={Under review}
+    note={}
     }
